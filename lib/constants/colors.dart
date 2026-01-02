@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // BMW Inspired Color Scheme - 60-30-10 Rule
-
   // 60% - Dominant Color (Background/Netral)
-  static const Color backgroundLight = Color(0xFFF8F9FA); // Light grey/white
+  static const Color backgroundLight = Color(0xFFF8F9FA);
   static const Color backgroundDark = Color(0xFF1A1A1A);
 
   // 30% - Primary Color (Brand Identity)
-  static const Color primaryBlue = Color(0xFF0066B1); // BMW Blue
+  static const Color primaryBlue = Color(0xFF0066B1);
   static const Color darkBlue = Color(0xFF003865);
   static const Color navyBlue = Color(0xFF1E3A5F);
 
   // 10% - Accent Color (Highlight)
-  static const Color accentGold = Color(0xFFE6B220); // BMW Gold
+  static const Color accentGold = Color(0xFFE6B220);
   static const Color accentRed = Color(0xFFCC0000);
   static const Color accentGreen = Color(0xFF4CAF50);
 

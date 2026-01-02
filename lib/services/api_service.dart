@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:showroom_mobil/models/car.dart';
 
 class ApiService {
-  // URL MockAPI Anda sudah benar
   static const String baseUrl = "https://6954f2a51cd5294d2c7df5ae.mockapi.io";
   static const String carsEndpoint = "$baseUrl/cars";
   static const String usersEndpoint = "$baseUrl/users";
@@ -13,7 +12,6 @@ class ApiService {
     'Content-Type': 'application/json',
   };
 
-  // Login - Perbaikan untuk handling response dari MockAPI
   static Future<Map<String, dynamic>?> login(
       String username, String password) async {
     try {
@@ -35,7 +33,6 @@ class ApiService {
           print('User in MockAPI: ${user['username']} - ${user['password']}');
         }
 
-        // Cari user yang cocok
         for (var user in users) {
           if (user['username'] == username && user['password'] == password) {
             print('Login successful for: $username');

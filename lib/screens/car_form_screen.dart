@@ -22,6 +22,7 @@ class _CarFormScreenState extends State<CarFormScreen> {
   final _hargaController = TextEditingController();
   final _warnaController = TextEditingController();
   final _deskripsiController = TextEditingController();
+  final _imageUrlController = TextEditingController();
 
   final List<String> _warnaOptions = [
     'Merah',
@@ -47,6 +48,7 @@ class _CarFormScreenState extends State<CarFormScreen> {
       _hargaController.text = widget.car!.harga.toString();
       _warnaController.text = widget.car!.warna;
       _deskripsiController.text = widget.car!.deskripsi;
+      _imageUrlController.text = widget.car!.imageUrl ?? '';
     }
   }
 
@@ -58,6 +60,7 @@ class _CarFormScreenState extends State<CarFormScreen> {
     _hargaController.dispose();
     _warnaController.dispose();
     _deskripsiController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
@@ -73,6 +76,9 @@ class _CarFormScreenState extends State<CarFormScreen> {
         harga: double.parse(_hargaController.text.trim()),
         warna: _warnaController.text.trim(),
         deskripsi: _deskripsiController.text.trim(),
+        imageUrl: _imageUrlController.text.trim().isEmpty
+            ? null
+            : _imageUrlController.text.trim(),
       );
 
       bool success;
@@ -99,20 +105,33 @@ class _CarFormScreenState extends State<CarFormScreen> {
     TextInputType? keyboardType,
     String? Function(String?)? validator,
     int? maxLines,
+    bool isRequired = true,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: AppColors.grey700,
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-              letterSpacing: 0.5,
-            ),
+          Row(
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: AppColors.grey700,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              if (!isRequired)
+                Text(
+                  ' (Optional)',
+                  style: TextStyle(
+                    color: AppColors.grey500,
+                    fontSize: 12,
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 8),
           TextFormField(
@@ -241,6 +260,86 @@ class _CarFormScreenState extends State<CarFormScreen> {
     }
   }
 
+  Widget _buildImagePreview() {
+    if (_imageUrlController.text.isEmpty) {
+      return Container(
+        height: 150,
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          color: AppColors.grey200,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.grey300),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.image,
+              size: 50,
+              color: AppColors.grey400,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'No image selected',
+              style: TextStyle(
+                color: AppColors.grey500,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Add an image URL to display preview',
+              style: TextStyle(
+                color: AppColors.grey400,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      height: 150,
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        image: DecorationImage(
+          image: NetworkImage(_imageUrlController.text),
+          fit: BoxFit.cover,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: 10,
+            right: 10,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                Icons.check_circle,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -320,6 +419,26 @@ class _CarFormScreenState extends State<CarFormScreen> {
                     ),
                   ],
                 ),
+              ),
+
+              // Image Preview
+              _buildImagePreview(),
+
+              // Image URL Field
+              _buildFormField(
+                label: 'Image URL',
+                controller: _imageUrlController,
+                icon: Icons.link,
+                isRequired: false,
+                validator: (value) {
+                  // Optional validation for URL format
+                  if (value != null && value.isNotEmpty) {
+                    if (!value.startsWith('http')) {
+                      return 'Please enter a valid URL (start with http/https)';
+                    }
+                  }
+                  return null;
+                },
               ),
 
               // Form Fields

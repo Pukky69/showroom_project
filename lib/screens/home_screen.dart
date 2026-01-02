@@ -50,12 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Car> get _filteredCars {
     var filtered = _cars;
 
-    // Filter by category (using merk/model as category proxy)
+    // Filter by category
     if (_selectedCategory > 0) {
       final category = _categories[_selectedCategory].toLowerCase();
       filtered = filtered.where((car) {
         final merkModel = '${car.merk} ${car.model}'.toLowerCase();
-        // This is simplified - in real app you'd have a category field
         return merkModel.contains(category) ||
             car.deskripsi.toLowerCase().contains(category);
       }).toList();
@@ -104,65 +103,96 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 height: 140,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.primaryBlue.withOpacity(0.8),
-                      AppColors.darkBlue
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: car.imageUrl != null && car.imageUrl!.isNotEmpty
+                      ? null
+                      : AppColors.primaryBlue.withOpacity(0.8),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),
                   ),
+                  image: car.imageUrl != null && car.imageUrl!.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(car.imageUrl!),
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withOpacity(0.2),
+                            BlendMode.darken,
+                          ),
+                        )
+                      : null,
                 ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      right: 20,
-                      top: 20,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                child: car.imageUrl == null || car.imageUrl!.isEmpty
+                    ? Container(
                         decoration: BoxDecoration(
-                          color: AppColors.accentGold,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '${car.tahun}',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                          gradient: LinearGradient(
+                            colors: [
+                              AppColors.primaryBlue.withOpacity(0.8),
+                              AppColors.darkBlue
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                         ),
-                      ),
-                    ),
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.directions_car,
+                                size: 60,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                car.merk.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : Stack(
                         children: [
-                          Icon(
-                            Icons.directions_car,
-                            size: 60,
-                            color: Colors.white.withOpacity(0.9),
+                          // Background overlay untuk gambar
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.3),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 10),
-                          Text(
-                            car.merk.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 2,
+                          Positioned(
+                            right: 20,
+                            top: 20,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.accentGold,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${car.tahun}',
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
-                ),
               ),
 
               // Car Details
@@ -179,35 +209,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
+                                car.merk,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.grey800,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
                                 car.model,
                                 style: TextStyle(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.navyBlue,
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 12,
-                                    height: 12,
-                                    margin: const EdgeInsets.only(right: 6),
-                                    decoration: BoxDecoration(
-                                      color: _getColorFromString(car.warna),
-                                      shape: BoxShape.circle,
-                                      border:
-                                          Border.all(color: AppColors.grey300),
-                                    ),
-                                  ),
-                                  Text(
-                                    car.warna,
-                                    style: TextStyle(
-                                      color: AppColors.grey600,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
                               ),
                             ],
                           ),
@@ -239,16 +255,71 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Description Preview
-                    Text(
-                      car.deskripsi.length > 100
-                          ? '${car.deskripsi.substring(0, 100)}...'
-                          : car.deskripsi,
-                      style: TextStyle(
-                        color: AppColors.grey600,
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
+                    // Basic Info Row
+                    Row(
+                      children: [
+                        // Year
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.grey100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today,
+                                size: 14,
+                                color: AppColors.grey600,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${car.tahun}',
+                                style: TextStyle(
+                                  color: AppColors.grey700,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        // Color
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.grey100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                margin: const EdgeInsets.only(right: 6),
+                                decoration: BoxDecoration(
+                                  color: _getColorFromString(car.warna),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.grey300),
+                                ),
+                              ),
+                              Text(
+                                car.warna,
+                                style: TextStyle(
+                                  color: AppColors.grey700,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 20),
@@ -259,9 +330,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                              horizontal: 16, vertical: 10),
                           decoration: BoxDecoration(
-                            color: AppColors.grey100,
+                            color: AppColors.primaryBlue,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(
@@ -269,14 +340,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(
                                 Icons.remove_red_eye,
                                 size: 16,
-                                color: AppColors.primaryBlue,
+                                color: Colors.white,
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 8),
                               Text(
                                 'View Details',
                                 style: TextStyle(
-                                  color: AppColors.primaryBlue,
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w500,
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
@@ -410,9 +482,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
-            // App Bar - SIMPLIFIED VERSION
+            // App Bar
             SliverAppBar(
-              expandedHeight: 140, // Dikurangi
+              expandedHeight: 140,
               floating: true,
               pinned: true,
               backgroundColor: Colors.white,

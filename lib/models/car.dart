@@ -6,6 +6,7 @@ class Car {
   double harga;
   String warna;
   String deskripsi;
+  String? imageUrl;
 
   Car({
     this.id,
@@ -15,6 +16,7 @@ class Car {
     required this.harga,
     required this.warna,
     required this.deskripsi,
+    this.imageUrl,
   });
 
   factory Car.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class Car {
           : double.parse(json['harga'].toString()),
       warna: json['warna'],
       deskripsi: json['deskripsi'],
+      imageUrl: json['imageUrl'],
     );
   }
 
@@ -41,6 +44,7 @@ class Car {
       'harga': harga,
       'warna': warna,
       'deskripsi': deskripsi,
+      'imageUrl': imageUrl,
     };
   }
 }
