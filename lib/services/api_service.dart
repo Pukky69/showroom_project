@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:showroom_mobil/models/car.dart';
 
 class ApiService {
-  static const String baseUrl = "https://6954f2a51cd5294d2c7df5ae.mockapi.io";
+  static const String baseUrl = "isi sendiri mockapi punya lu";
   static const String carsEndpoint = "$baseUrl/cars";
   static const String usersEndpoint = "$baseUrl/users";
 
